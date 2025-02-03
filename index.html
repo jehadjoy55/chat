@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bangla Secure Chat</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      padding: 20px;
+    }
+
+    #chat-window {
+      width: 100%;
+      max-width: 500px;
+      margin: 0 auto;
+      background-color: #fff;
+      border-radius: 8px;
+      padding: 10px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      height: 300px;
+      overflow-y: scroll;
+    }
+
+    #message-input {
+      width: 80%;
+      padding: 10px;
+      font-size: 16px;
+    }
+
+    #send-button {
+      padding: 10px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    .message {
+      margin-bottom: 10px;
+      padding: 10px;
+      background-color: #f1f1f1;
+      border-radius: 5px;
+    }
+
+    .sender {
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Bangla Secure Chat</h1>
+
+  <div id="chat-window"></div>
+
+  <input type="text" id="message-input" placeholder="Type your message" />
+  <button id="send-button">Send</button>
+
+  <script src="https://cdn.socket.io/4.1.0/socket.io.min.js"></script>
+  <script>
+    // Connect to the backend server using Socket.IO
+    const socket = io('https://bangla-secure-chat-production.up.railway.app');
+
+    // DOM elements
+    const messageInput = document.getElementById('message-input');
+    const sendButton = document.getElementById('send-button');
+    const chatWindow = document.getElementById('chat-window');
+
+    // Send message function
+    function sendMessage() {
+      const message = messageInput.value.trim();
+      if (message) {
+        // Emit the message to the backend
+        socket.emit('message', { message: message, sender: 'User' });
+        messageInput.value = '';
+      }
+    }
+
+    // Event listener for the send button
+    sendButton.addEventListener('click', sendMessage);
+
+    // Listen for incoming messages from the backend
+    socket.on('message', (data) => {
+      const messageElement = document.createElement('div');
+      messageElement.classList.add('message');
+      messageElement.innerHTML = `<span class="sender">${data.sender}: </span>${data.message}`;
+      chatWindow.appendChild(messageElement);
+      chatWindow.scrollTop = chatWindow.scrollHeight; // Scroll to the latest message
+    });
+  </script>
+
+</body>
+</html>
